@@ -3,8 +3,18 @@ const app = express();
 const bodyParser = require('body-parser');
 const db = require('./models');
 const userRoute = require('./routes/user');
+const  cors = require('cors')
+
+app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+/// route react
+
+/// general routes
+
+/// auth routes
+
 
 const appPromise = (async () => {
 
@@ -13,7 +23,6 @@ const appPromise = (async () => {
     db.sequelize.authenticate().then(() => {
         console.log('connection established');
     })
-    console.log('121');
     
     app.use(
         bodyParser.urlencoded({
@@ -33,5 +42,5 @@ const appPromise = (async () => {
 
 appPromise.then((app) => {
     // app.listen(8080, 'back')
-    app.listen(8080, () => console.log('ку ебать'));
+    app.listen(3001, () => console.log('ку ебать'));
 })

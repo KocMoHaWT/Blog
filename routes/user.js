@@ -1,16 +1,21 @@
 const path = require('path');
-const { User } = require('../models/index');
+const { db } = require('../models/index');
 
 const express = require('express');
+const passport = require('../middleware/checkRefresh');
+const authControler = require('../controllers/authorizationController');
 
 const router = express.Router();
 
-router.get('/user', async (req, res, next) => {
-  console.log('ahdslkajhldkHJkldhljHDJKLhajd');
+router.post('/login', authControler.authorization);
 
-  await User.create({first_name: 'vlad', last_name: 'Dontsov', email: 'dksdljflkjdsf'});
-  res.send('Hello World');
-  res.end();
+router.post('/register', authControler.registration);
+
+router.post('/refresh-token', authControler.getNewRefreshToken);
+
+router.get('/user/name', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  const { user } = req;
+  return res.status(200).json({ name: user.name});
 })
 
 module.exports = router;
