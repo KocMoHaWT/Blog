@@ -2,12 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(module.filename);
+const config = require('../config');
 const db = {};
 const modelsExtensionsMap = [];
 
-const sequelize = new Sequelize('blog', 'root', 'root', {
-  // host: 'db',
-  host: '127.0.0.1',
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+  host: config.host,
   port: '3306',
   dialect: 'mysql'
 });
