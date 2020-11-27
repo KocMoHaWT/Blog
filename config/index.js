@@ -11,4 +11,5 @@ module.exports  = {
   password: process.env.password || 'root',
   username: process.env.username || 'root',
   database: process.env.database || 'blog',
+  port: process.env.port || 3001,
 }
