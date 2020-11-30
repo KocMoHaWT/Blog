@@ -3,7 +3,7 @@ import './App.css';
 import { Helmet } from 'react-helmet';
 import { Router, Switch, Route, Redirect } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { LoginPage } from './core/feature/authFlow/contatiners/userLoginPage';
+import LoginPage from './core/feature/authFlow/contatiners/loginPage';
 import history from './history';
 
 function App() {
