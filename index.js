@@ -42,5 +42,5 @@ const appPromise = (async () => {
 })();
 
 appPromise.then((app) => {
-    app.listen(config.port, () => console.log(config));
+    app.listen(config.port, () => console.log('ку ебать'));
 })
