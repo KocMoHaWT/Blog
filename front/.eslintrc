@@ -1,0 +1,48 @@
+{
+  "parser": "",
+  "plugins": ["react", "prettier"],
+  "extends": [
+    "airbnb",
+    "plugin:react/recommended",
+    "prettier",
+    "prettier/react"
+  ],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "jest": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".ts", "tsx"] }],
+    "react/jsx-props-no-spreading": "off",
+    "react/button-has-type": "off",
+    "no-useless-constructor": "off",
+    "no-empty-function": "off",
+    "react/prop-types": "off",
+    "max-classes-per-file": "off",
+    "react/no-unescaped-entities": "off",
+    "import/no-unresolved": "off",
+    "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "no-plusplus": "off",
+    "no-return-assign": "off",
+    "global-require": "off",
+    "no-param-reassign": "warn",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "import/no-named-as-default": "off",
+    "import/no-named-as-default-member": "off",
+    "no-alert": "error",
+    "eol-last": "error",
+    "semi": "error"
+  },
+  "overrides": []
+}
