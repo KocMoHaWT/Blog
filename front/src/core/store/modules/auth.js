@@ -1,6 +1,7 @@
 import { all, put, call, takeLatest } from 'redux-saga/effects';
 import history from '../../../history';
-import { getName, sendLoginData, sendRegisterData } from "../api/authFlow-request";
+import {getName, getNewToken, sendLoginData, sendRegisterData} from "../api/authFlow-request";
+import {barrier, breakBarrier, raiseBarrier} from "./barrier";
 
 const LOGIN = '[auth flow] log in action';
 const LOGIN_SUCCESS = '[auth flow] log in action success';
@@ -17,6 +18,11 @@ const REGISTER_FAILURE = '[auth flow] register user failure';
 const GET_NAME = '[auth flow] get name';
 const GET_NAME_SUCCESS = '[auth flow] get name success';
 const GET_NAME_FAILURE = '[auth flow] get name failure';
+
+const GET_TOKEN_VIA_REFRESH = '[auth flow] get token via refresh';
+const GET_TOKEN_VIA_REFRESH_SUCCESS = '[auth flow] get token via refresh success';
+const GET_TOKEN_VIA_REFRESH_FAILURE = '[auth flow] get token via refresh failure';
+
 
 
 export const loginAct = (loginData) => {
@@ -57,6 +63,10 @@ export const getNameSuccessAct = ({ name }) => {
 };
 export const getNameFailureAct = () => ({ type: GET_NAME_FAILURE });
 
+export const getTokenViaRefresh = () => ({ type: GET_TOKEN_VIA_REFRESH });
+export const getTokenViaRefreshSuccess = () => ({ type: GET_TOKEN_VIA_REFRESH_SUCCESS });
+export const getTokenViaRefreshFailure = () => ({ type: GET_TOKEN_VIA_REFRESH_FAILURE });
+
 /// reducer 
 
 const initalState = {
@@ -95,6 +105,7 @@ export function* watchLogInAct(loginData) {
 
 function* watchGetName() {
     try {
+      yield barrier('refresh-token');
       const { data } = yield call(getName);
       yield put(getNameSuccessAct(data));
     } catch (e) {
@@ -123,10 +134,30 @@ function* watchGetRegistration(registerData) {
     }
 }
 
+function* watchGetTokenWithRefresh() {
+  try {
+    yield raiseBarrier('refresh-token');
+    const refresh = localStorage.getItem('refreshToken');
+    if (!refresh) {
+     throw new Error('invalid token');
+    }
+    const { data } = yield call(getNewToken, refresh);
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    yield breakBarrier('refresh-token');
+    yield put(getTokenViaRefreshSuccess());
+  } catch (e) {
+    yield call(history.push, '/login');
+    yield put(getTokenViaRefreshFailure());
+  }
+}
+
 export function* authRootSaga() {
   yield all([
     takeLatest(LOGIN, watchLogInAct),
     takeLatest(LOGOUT, watchLogout),
     takeLatest(GET_NAME, watchGetName),
-    takeLatest(REGISTER, watchGetRegistration)]);
+    takeLatest(REGISTER, watchGetRegistration),
+    takeLatest(GET_TOKEN_VIA_REFRESH, watchGetTokenWithRefresh)
+  ]);
 }

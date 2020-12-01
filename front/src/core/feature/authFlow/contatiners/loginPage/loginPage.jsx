@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -10,6 +10,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { useDispatch } from "react-redux";
+import {loginAct} from "../../../../store/modules/auth";
 
 
 
@@ -50,7 +52,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const  LoginPage = () => {
+  const dispatch = useDispatch();
   const classes = useStyles();
+
+  const [values, setValues] = useState({
+    email: '',
+    password: '',
+  });
+
+  const handleSubmit = () => {
+    dispatch(loginAct(values));
+  };
+  
+  const  handleChange = (e) => {
+    setValues( { ...values, [e.target.name]: e.target.value });
+  };
 
   return (
     <Container className={classes.wrapper} maxWidth="false">
@@ -62,7 +78,7 @@ export const  LoginPage = () => {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate>
+          <form className={classes.form} noValidate onSubmit={handleSubmit}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -73,6 +89,8 @@ export const  LoginPage = () => {
               name="email"
               autoComplete="email"
               autoFocus
+              value={values.email}
+              onChange={handleChange}
             />
             <TextField
               variant="outlined"
@@ -84,6 +102,8 @@ export const  LoginPage = () => {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={values.password}
+              onChange={handleChange}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

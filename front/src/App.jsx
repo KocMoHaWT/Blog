@@ -19,7 +19,8 @@ function App() {
       <Router history={history}>
         <Switch>
           <Route path="/login" exact component={LoginPage} />
-          {/* <Route path="/registration" exact component={RegisterPage} /> */}
+           {/*<Route path="/registration" exact component={RegisterPage} /> */}
+           <Route path="/registration" exact component={} />
           {/* <PrivateRoute path="/" component={MainPage} /> */}
           <Redirect to="/login" />
         </Switch>
