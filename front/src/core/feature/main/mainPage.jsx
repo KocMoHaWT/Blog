@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
@@ -6,15 +6,17 @@ import Container from '@material-ui/core/Container';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import FacebookIcon from '@material-ui/icons/Facebook';
 import TwitterIcon from '@material-ui/icons/Twitter';
+import {useDispatch} from "react-redux";
+import post1 from '../../../assets/blog-post1.md';
+import post2 from '../../../assets/blog-post2.md';
+import post3 from '../../../assets/blog-post3.md';
 import Header from '../../shared/header/header';
 import MainFeaturedPost from './containers/mainFeaturedPost/mainFeaturePost';
 import FeaturedPost from './containers/featurePost/featurePosts';
 import MainBlock from './containers/main/mainBlock';
 import Sidebar from './containers/sidebar/sidebar';
 import Footer from '../../shared/footer/footer';
-import post1 from './blog-post.1.md';
-import post2 from './blog-post.2.md';
-import post3 from './blog-post.3.md';
+import {getNameAct, getTestAct} from "../../store/modules/auth";
 
 const useStyles = makeStyles((theme) => ({
   mainGrid: {
@@ -90,8 +92,13 @@ const sidebar = {
 };
 
 export default function MainPage() {
+  const dispatch = useDispatch();
   const classes = useStyles();
-
+  
+  useEffect(() => {
+    dispatch(getNameAct());
+    dispatch(getTestAct());
+  }, []);
   return (
     <>
       <CssBaseline />

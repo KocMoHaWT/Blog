@@ -40,7 +40,7 @@ export default function Sidebar(props) {
         Social
       </Typography>
       {social.map((network) => (
-        <Link display="block" variant="body1" href="#" key={network}>
+        <Link display="block" variant="body1" href="#" key={network.name}>
           <Grid container direction="row" spacing={1} alignItems="center">
             <Grid item>
               <network.icon />
@@ -54,8 +54,8 @@ export default function Sidebar(props) {
 }
 
 Sidebar.propTypes = {
-  archives: PropTypes.arrayOf(PropTypes.string).isRequired,
+  archives: PropTypes.arrayOf(PropTypes.object).isRequired,
   description: PropTypes.string.isRequired,
-  social: PropTypes.arrayOf(PropTypes.string).isRequired,
+  social: PropTypes.arrayOf(PropTypes.object).isRequired,
   title: PropTypes.string.isRequired,
 };

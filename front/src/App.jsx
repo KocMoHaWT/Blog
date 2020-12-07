@@ -5,6 +5,7 @@ import { Router, Switch, Route, Redirect } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import LoginPage from './core/feature/authFlow/contatiners/loginPage';
 import history from './history';
+import MainPage from "./core/feature/main/mainPage";
 
 function App() {
   return (
@@ -19,9 +20,9 @@ function App() {
       <Router history={history}>
         <Switch>
           <Route path="/login" exact component={LoginPage} />
-           {/*<Route path="/registration" exact component={RegisterPage} /> */}
-           <Route path="/registration" exact component={} />
-          {/* <PrivateRoute path="/" component={MainPage} /> */}
+          <Route path="/" exact component={MainPage} />
+           {/* <Route path="/registration" exact component={RegisterPage} /> */}
+           {/* <PrivateRoute path="/" component={MainPage} /> */}
           <Redirect to="/login" />
         </Switch>
       </Router>

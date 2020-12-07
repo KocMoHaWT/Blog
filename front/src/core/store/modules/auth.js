@@ -1,7 +1,8 @@
 import { all, put, call, takeLatest } from 'redux-saga/effects';
 import history from '../../../history';
 import {getName, getNewToken, sendLoginData, sendRegisterData} from "../api/authFlow-request";
-import {barrier, breakBarrier, raiseBarrier} from "./barrier";
+import {barrier, raiseBarrier, breakBarrier, _barriers} from "./barrier";
+import * as ap from "../api";
 
 const LOGIN = '[auth flow] log in action';
 const LOGIN_SUCCESS = '[auth flow] log in action success';
@@ -19,11 +20,13 @@ const GET_NAME = '[auth flow] get name';
 const GET_NAME_SUCCESS = '[auth flow] get name success';
 const GET_NAME_FAILURE = '[auth flow] get name failure';
 
+const GET_TEST = '[auth flow] get test';
+const GET_TEST_SUCCESS = '[auth flow] get test success';
+const GET_TEST_FAILURE = '[auth flow] get test failure';
+
 const GET_TOKEN_VIA_REFRESH = '[auth flow] get token via refresh';
 const GET_TOKEN_VIA_REFRESH_SUCCESS = '[auth flow] get token via refresh success';
 const GET_TOKEN_VIA_REFRESH_FAILURE = '[auth flow] get token via refresh failure';
-
-
 
 export const loginAct = (loginData) => {
  return {
@@ -63,6 +66,15 @@ export const getNameSuccessAct = ({ name }) => {
 };
 export const getNameFailureAct = () => ({ type: GET_NAME_FAILURE });
 
+export const getTestAct = () => ({ type: GET_TEST });
+export const getTestSuccessAct = ({ name }) => {
+  return {
+    type: GET_TEST_SUCCESS,
+    name,
+  };
+};
+export const getTestFailureAct = () => ({ type: GET_TEST_FAILURE });
+
 export const getTokenViaRefresh = () => ({ type: GET_TOKEN_VIA_REFRESH });
 export const getTokenViaRefreshSuccess = () => ({ type: GET_TOKEN_VIA_REFRESH_SUCCESS });
 export const getTokenViaRefreshFailure = () => ({ type: GET_TOKEN_VIA_REFRESH_FAILURE });
@@ -90,10 +102,19 @@ export default function authReducer(state = initalState, action) {
 }
 
 // sagas
+// const testAsync = async () => {
+//   const value = await barrier('refresh-token');
+//   return value;
+// };
+const tokenBarrier = async function () {
+  const value = await barrier('refresh-token');
+  return value;
+};
 
-export function* watchLogInAct(loginData) {
+export function* watchLogInAct({ loginData }) {
   try {
-    const { data } = yield call(sendLoginData, loginData);
+    const { email, password } = loginData;
+    const { data } = yield call(sendLoginData, { email, password });
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     yield put(loginSuccessAct());
@@ -104,13 +125,37 @@ export function* watchLogInAct(loginData) {
 }
 
 function* watchGetName() {
-    try {
-      yield barrier('refresh-token');
-      const { data } = yield call(getName);
-      yield put(getNameSuccessAct(data));
-    } catch (e) {
-      yield put(getNameFailureAct());
+
+  try {
+    const token = yield localStorage.getItem('accessToken');
+    yield ap.setAuthHeader(token);
+    const test = yield call(tokenBarrier);
+    yield console.log(test);
+    const { data } = yield call(getName);
+    yield put(getNameSuccessAct(data));
+  } catch (e) {
+    if (!_barriers['refresh-token']) {
+      yield put(getTokenViaRefresh());
     }
+    yield put(getNameFailureAct());
+  }
+}
+
+function* watchGetTest() {
+
+  try {
+    const token = yield localStorage.getItem('accessToken');
+    yield ap.setAuthHeader(token);
+    const test = yield call(tokenBarrier);
+    yield console.log(test);
+    const { data } = yield call(getName);
+    yield put(getTestSuccessAct(data));
+  } catch (e) {
+    if (!_barriers['refresh-token']) {
+      yield put(getTokenViaRefresh());
+    }
+    yield put(getTestFailureAct());
+  }
 }
 
 function* watchLogout() {
@@ -142,8 +187,8 @@ function* watchGetTokenWithRefresh() {
      throw new Error('invalid token');
     }
     const { data } = yield call(getNewToken, refresh);
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
+    yield localStorage.setItem('accessToken', data.accessToken);
+    yield localStorage.setItem('refreshToken', data.refreshToken);
     yield breakBarrier('refresh-token');
     yield put(getTokenViaRefreshSuccess());
   } catch (e) {
@@ -154,10 +199,11 @@ function* watchGetTokenWithRefresh() {
 
 export function* authRootSaga() {
   yield all([
+    takeLatest(GET_TOKEN_VIA_REFRESH, watchGetTokenWithRefresh),
     takeLatest(LOGIN, watchLogInAct),
     takeLatest(LOGOUT, watchLogout),
     takeLatest(GET_NAME, watchGetName),
     takeLatest(REGISTER, watchGetRegistration),
-    takeLatest(GET_TOKEN_VIA_REFRESH, watchGetTokenWithRefresh)
+    takeLatest(GET_TEST, watchGetTest),
   ]);
 }

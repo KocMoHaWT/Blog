@@ -1,4 +1,4 @@
-import { ax } from './index';
+import ax from './index';
 import api from '../../shared/constans';
 
 export const sendLoginData = (loginData) => {

@@ -1,3 +1,15 @@
 import axios from 'axios';
 
-export const ax = axios.create();
+const ax = axios.create();
+
+export const setHeader = (key, value) => {
+  ax.defaults.headers.common[key] = value;
+};
+
+export const setAuthHeader = (token) => {
+  setHeader('Authorization', `Bearer ${token}`);
+};
+
+export default ax;
+
+

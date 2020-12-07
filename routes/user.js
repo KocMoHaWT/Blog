@@ -18,4 +18,9 @@ router.get('/user/name', passport.authenticate('jwt', { session: false }), async
   return res.status(200).json({ name: user.name});
 })
 
+router.get('/user/email', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  const { user } = req;
+  return res.status(200).json({ email: user.email});
+})
+
 module.exports = router;

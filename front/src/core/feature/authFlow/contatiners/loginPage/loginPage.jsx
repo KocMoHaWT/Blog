@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useDispatch } from "react-redux";
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import {loginAct} from "../../../../store/modules/auth";
 
 
@@ -58,10 +59,11 @@ export const  LoginPage = () => {
   const [values, setValues] = useState({
     email: '',
     password: '',
+    remember: false,
   });
 
   const handleSubmit = () => {
-    dispatch(loginAct(values));
+    dispatch(loginAct({ email: values.email, password: values.password }));
   };
   
   const  handleChange = (e) => {
@@ -78,8 +80,11 @@ export const  LoginPage = () => {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate onSubmit={handleSubmit}>
-            <TextField
+          <ValidatorForm
+            onSubmit={handleSubmit}
+            onError={errors => console.log(errors)}
+          >
+            <TextValidator
               variant="outlined"
               margin="normal"
               required
@@ -89,6 +94,8 @@ export const  LoginPage = () => {
               name="email"
               autoComplete="email"
               autoFocus
+              validators={['required', 'isEmail']}
+              errorMessages={['this field is required', 'email is not valid']}
               value={values.email}
               onChange={handleChange}
             />
@@ -101,12 +108,14 @@ export const  LoginPage = () => {
               label="Password"
               type="password"
               id="password"
+              validators={['required']}
+              errorMessages={['this field is required']}
               autoComplete="current-password"
               value={values.password}
               onChange={handleChange}
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value={values.remember} color="primary" handleChange name="remember"  />}
               label="Remember me"
             />
             <Button
@@ -130,7 +139,7 @@ export const  LoginPage = () => {
                 </Link>
               </Grid>
             </Grid>
-          </form>
+          </ValidatorForm>
         </div>
       </Container>
     </Container>
