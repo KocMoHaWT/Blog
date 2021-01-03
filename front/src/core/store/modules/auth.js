@@ -1,7 +1,8 @@
 import { all, put, call, takeLatest } from 'redux-saga/effects';
 import history from '../../../history';
 import {getName, getNewToken, sendLoginData, sendRegisterData} from "../api/authFlow-request";
-import {barrier, raiseBarrier, breakBarrier, _barriers} from "./barrier";
+// eslint-disable-next-line import/no-cycle
+import {raiseBarrier, breakBarrier, runRequest} from "./barrier";
 import * as ap from "../api";
 
 const LOGIN = '[auth flow] log in action';
@@ -106,10 +107,6 @@ export default function authReducer(state = initalState, action) {
 //   const value = await barrier('refresh-token');
 //   return value;
 // };
-const tokenBarrier = async function () {
-  const value = await barrier('refresh-token');
-  return value;
-};
 
 export function* watchLogInAct({ loginData }) {
   try {
@@ -125,35 +122,26 @@ export function* watchLogInAct({ loginData }) {
 }
 
 function* watchGetName() {
-
   try {
     const token = yield localStorage.getItem('accessToken');
     yield ap.setAuthHeader(token);
-    const test = yield call(tokenBarrier);
-    yield console.log(test);
-    const { data } = yield call(getName);
+    const data = yield runRequest(getName);
+    console.log(data);
     yield put(getNameSuccessAct(data));
   } catch (e) {
-    if (!_barriers['refresh-token']) {
-      yield put(getTokenViaRefresh());
-    }
+    yield put(getTokenViaRefresh());
     yield put(getNameFailureAct());
   }
 }
 
 function* watchGetTest() {
-
   try {
     const token = yield localStorage.getItem('accessToken');
     yield ap.setAuthHeader(token);
-    const test = yield call(tokenBarrier);
-    yield console.log(test);
-    const { data } = yield call(getName);
+    const data = yield runRequest(getName);
+    console.log(data);
     yield put(getTestSuccessAct(data));
   } catch (e) {
-    if (!_barriers['refresh-token']) {
-      yield put(getTokenViaRefresh());
-    }
     yield put(getTestFailureAct());
   }
 }
@@ -187,6 +175,7 @@ function* watchGetTokenWithRefresh() {
      throw new Error('invalid token');
     }
     const { data } = yield call(getNewToken, refresh);
+
     yield localStorage.setItem('accessToken', data.accessToken);
     yield localStorage.setItem('refreshToken', data.refreshToken);
     yield breakBarrier('refresh-token');
